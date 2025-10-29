@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+   <link rel="icon" type="image/svg" href="./IMG/tree-svgrepo-com.svg"/>
+  <title>JSON Tree Visualizer</title>
+  <link rel="stylesheet" href="./CSS/style.css" />
+</head>
+<body>
+  <div class="bb8-toggle-wrapper">
+    <label class="bb8-toggle" title="Dark/Light Mode">
+      <input class="bb8-toggle__checkbox" type="checkbox" id="darkModeToggle" />
+      <div class="bb8-toggle__container">
+        <div class="bb8-toggle__scenery">
+          <div class="bb8-toggle__star"></div>
+          <div class="bb8-toggle__star"></div>
+          <div class="bb8-toggle__star"></div>
+          <div class="bb8-toggle__star"></div>
+          <div class="bb8-toggle__star"></div>
+          <div class="bb8-toggle__star"></div>
+          <div class="bb8-toggle__star"></div>
+          <div class="tatto-1"></div>
+          <div class="tatto-2"></div>
+          <div class="gomrassen"></div>
+          <div class="hermes"></div>
+          <div class="chenini"></div>
+          <div class="bb8-toggle__cloud"></div>
+          <div class="bb8-toggle__cloud"></div>
+          <div class="bb8-toggle__cloud"></div>
+        </div>
+        <div class="bb8">
+          <div class="bb8__head-container">
+            <div class="bb8__antenna"></div>
+            <div class="bb8__antenna"></div>
+            <div class="bb8__head"></div>
+          </div>
+          <div class="bb8__body"></div>
+        </div>
+        <div class="artificial__hidden">
+          <div class="bb8__shadow"></div>
+        </div>
+      </div>
+    </label>
+  </div>
+  <header>JSON Tree Visualizer <span class="apiwiz-subtitle"></span></header>
+  <main>
+    <section id="sidebar">
+      <label for="jsonInput"><b>JSON Input</b></label>
+      <textarea id="jsonInput" placeholder='Paste or type JSON here...'>{
+  "user": {
+    "id": 1,
+    "name": "kiran",
+    "address": {
+      "city": "Chennai",
+      "zip": "600021"
+    }
+  },
+  "items": [
+    { "name": "RichdadBook", "price": 450 },
+    { "name": "Pen", "price": 50 }
+  ],
+  "active": true
+}</textarea>
+      <div id="jsonError" class="message"></div>
+      <div class="sidebar-actions">
+        <button id="visualizeBtn">Generate Tree</button>
+        <button id="clearBtn" title="Clear input and visualizer">Clear/Reset</button>
+        <button id="downloadBtn" title="Download tree as PNG">Download Image</button>
+      </div>
+      <div class="message" id="actionMessage"></div>
+      <div class="search-group">
+        <label for="searchInput"><b>Search (by path)</b></label>
+        <input type="text" id="searchInput" placeholder="e.g. $.user.address.city,items[1].name" />
+        <button id="searchBtn">Search</button>
+        <div id="searchMessage" class="message"></div>
+      </div>
+      <div id="legend">
+        <b>Legend</b>
+        <div><span style="color:#6a5acd">■</span> Object</div>
+        <div><span style="color:#4caf50">■</span> Array</div>
+        <div><span style="color:#ff9800">■</span> Primitive</div>
+        <div><span style="color:#d32f2f">■</span> Highlighted</div>
+      </div>
+    </section>
+    <section id="treeContainer" tabindex="0" aria-label="JSON Tree Visualization Canvas">
+      <svg id="svgRoot" width="100%" height="700px"></svg>
+      <div id="zoomControls">
+        <button id="zoomInBtn">Zoom In</button>
+        <button id="zoomOutBtn">Zoom Out</button>
+        <button id="fitViewBtn">Fit View</button>
+      </div>
+    </section>
+  </main>
+  <script src="./JAVASCRIPT/app.js"></script>
+</body>
+</html>
