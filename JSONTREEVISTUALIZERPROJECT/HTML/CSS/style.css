@@ -8,21 +8,20 @@
 /* Top-right floating BB8 toggle style */
 .bb8-toggle-wrapper {
   position: fixed;
-  top: 14px;
-  right: 18px;
+  top: 10px;
+  right: 14px;
   z-index: 1999;
-  background: transparent;
-  user-select: none;
+  transform: scale(0.85); /* makes the toggle slightly smaller */
 }
 
 /* --- Begin BB8 Toggle CSS (full) --- */
 .bb8-toggle {
-  --toggle-size: 18px;
-  --toggle-width: 10.625em;
-  --toggle-height: 5.625em;
+  --toggle-size: 12px; /* smaller overall size */
+  --toggle-width: 6.5em;
+  --toggle-height: 3.5em;
+  --bb8-diameter: 2.8em; /* match BB8 size */
   --toggle-offset: calc((var(--toggle-height) - var(--bb8-diameter)) / 2);
   --toggle-bg: linear-gradient(#2c4770, #070e2b 35%, #628cac 50% 70%, #a6c5d4) no-repeat;
-  --bb8-diameter: 4.375em;
   --radius: 99em;
   --transition: 0.4s;
   --accent: #de7d2f;
@@ -183,7 +182,7 @@ body.dark-mode #legend { color: #d2d2d2; }
   position: absolute; right: 12px; top: 12px; display: flex; flex-direction: column; gap: 8px; z-index: 99;
 }
 #zoomControls button {background: #3456b8; color: #fff; width: 100px; text-align: center; font-size: 15px;}
-.node-rect { stroke: #333; stroke-width: 1; cursor: pointer; }
+.node-rect { stroke: #333; stroke-width: 1; cursor: pointer;filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
 .node-object { fill: #6a5acd; fill-opacity: 0.8; stroke: #3f2a8a; }
 .node-array { fill: #4caf50; fill-opacity: 0.8; stroke: #2c6b2d; }
 .node-primitive { fill: #ff9800; fill-opacity: 0.8; stroke: #b26a00; }

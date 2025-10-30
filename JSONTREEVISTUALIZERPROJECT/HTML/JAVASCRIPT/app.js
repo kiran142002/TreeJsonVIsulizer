@@ -37,7 +37,7 @@ toggle.addEventListener('change', function () {
   let scale = 1, translateX = 0, translateY = 0, isPanning = false, startPan = { x: 0, y: 0 };
   const NODE_WIDTH = 140, NODE_HEIGHT = 38, LEVEL_X_SPACING = 180, NODE_Y_SPACING = 70;
 
-  // --- JSON path parse ---
+  // --- JSON path parse --- code--
   function parsePath(path) {
     let p = path.trim();
     if (p.startsWith("$.")) p = p.slice(2);
@@ -51,7 +51,7 @@ toggle.addEventListener('change', function () {
     return result;
   }
 
-  // --- Tree Construction ---
+  // --- Tree Construction ---code--
   function getNodeType(v) {
     if (v === null || typeof v !== "object") return "primitive";
     if (Array.isArray(v)) return "array";
@@ -98,7 +98,7 @@ toggle.addEventListener('change', function () {
     return `${key}: ${JSON.stringify(node.data)}`;
   }
 
-  // --- Render ---
+  // --- Render --- code
   function renderTree() {
     while (svg.firstChild) svg.removeChild(svg.firstChild);
     svg.setAttribute("style", `transform: translate(${translateX}px,${translateY}px) scale(${scale})`);
@@ -123,7 +123,7 @@ toggle.addEventListener('change', function () {
       g.setAttribute("class", "node-group");
       g.setAttribute("data-nodeid", id);
       g.style.cursor = "pointer";
-      // Copy path on click
+      //Copy path 
       g.addEventListener("click", function(e) {
         if (navigator.clipboard) {
           navigator.clipboard.writeText(id).then(() => {
@@ -180,7 +180,6 @@ toggle.addEventListener('change', function () {
     renderTree();
   });
 
-  // MULTI-path search
   function searchNodesByPaths(paths) {
     if (!data) return [];
     let foundIds = [];
@@ -215,7 +214,7 @@ toggle.addEventListener('change', function () {
     renderTree();
   }
 
-  // --- UI events ---
+
   searchInput.addEventListener("input", () => {
     searchBtn.disabled = !searchInput.value.trim();
     searchMessage.textContent = "";
@@ -295,35 +294,91 @@ toggle.addEventListener('change', function () {
   zoomInBtn.addEventListener("click", () => zoom(1.2));
   zoomOutBtn.addEventListener("click", () => zoom(0.8));
   fitViewBtn.addEventListener("click", () => fitView());
+// --- Download as PNG (Full Tree Capture, No Cropping) ---
+downloadBtn.addEventListener("click", async function () {
+  actionMessage.textContent = "Preparing image...";
 
-  // --- Download as PNG ---
-  downloadBtn.addEventListener("click", function () {
-    actionMessage.textContent = "Preparing image...";
-    // Create a serializer
-    let serializer = new XMLSerializer();
-    let svgContent = serializer.serializeToString(svg);
-    let canvas = document.createElement("canvas");
-    canvas.width = svg.viewBox && svg.viewBox.baseVal.width ? svg.viewBox.baseVal.width : svg.width.baseVal.value;
-    canvas.height = svg.viewBox && svg.viewBox.baseVal.height ? svg.viewBox.baseVal.height : svg.height.baseVal.value;
-    let ctx = canvas.getContext("2d");
-    let img = new Image();
-    // SVG must have XML header for <image> to load
-    img.src = 'data:image/svg+xml;base64,' + btoa('<?xml version="1.0" encoding="UTF-8"?>' + svgContent);
-    img.onload = function () {
-      ctx.fillStyle = body.classList.contains('dark-mode') ? "#181c22" : "#f4f6fb";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-      let a = document.createElement("a");
-      a.download = "json-tree.png";
-      a.href = canvas.toDataURL("image/png");
-      a.click();
-      actionMessage.textContent = "Image downloaded!";
-      setTimeout(() => { actionMessage.textContent = ""; }, 1300);
-    };
-    img.onerror = function () {
-      actionMessage.textContent = "Failed to render SVG image!";
-    };
-  });
+  // Temporarily reset view to full scale before capture
+  const prevScale = scale;
+  const prevX = translateX;
+  const prevY = translateY;
+  scale = 1;
+  translateX = 0;
+  translateY = 0;
+  renderTree();
+
+  // Allow layout to stabilize
+  await new Promise(r => setTimeout(r, 300));
+
+  // ✅ Inline text styles to preserve labels
+  function inlineSVGTextStyles(svgElement) {
+    const textElements = svgElement.querySelectorAll("text");
+    textElements.forEach(t => {
+      const style = window.getComputedStyle(t);
+      t.setAttribute("fill", style.fill || "#000");
+      t.setAttribute("font-family", style.fontFamily || "Arial, sans-serif");
+      t.setAttribute("font-size", style.fontSize || "12px");
+      t.setAttribute("font-weight", style.fontWeight || "400");
+      t.setAttribute("dominant-baseline", "middle");
+      t.setAttribute("text-anchor", "start");
+    });
+  }
+  inlineSVGTextStyles(svg);
+
+  const serializer = new XMLSerializer();
+  const svgContent = serializer.serializeToString(svg);
+
+  const canvas = document.createElement("canvas");
+  const bbox = svg.getBBox(); // Get actual drawn area
+  canvas.width = bbox.width + 80;
+  canvas.height = bbox.height + 80;
+
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  const img = new Image();
+  img.src = 'data:image/svg+xml;base64,' +
+    btoa('<?xml version="1.0" encoding="UTF-8"?>' + svgContent);
+
+  img.onload = function () {
+    ctx.fillStyle = body.classList.contains('dark-mode') ? "#181c22" : "#f4f6fb";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 40, 40); // add padding
+
+    const a = document.createElement("a");
+    a.download = "json-tree.png";
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+
+    actionMessage.textContent = "Image downloaded!";
+    setTimeout(() => { actionMessage.textContent = ""; }, 1300);
+
+    // Restore original zoom
+    scale = prevScale;
+    translateX = prevX;
+    translateY = prevY;
+    renderTree();
+  };
+
+  img.onerror = function () {
+    actionMessage.textContent = "Failed to render SVG image!";
+    scale = prevScale;
+    translateX = prevX;
+    translateY = prevY;
+    renderTree();
+  };
+
+
+
+  img.onerror = function () {
+    actionMessage.textContent = "Failed to render SVG image!";
+    scale = prevScale;
+    translateX = prevX;
+    translateY = prevY;
+    renderTree();
+  };
+});
 
   visualizeBtn.click();
 })();
